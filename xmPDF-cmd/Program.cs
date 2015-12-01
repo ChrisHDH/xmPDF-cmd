@@ -111,16 +111,22 @@ namespace xmPDF_cmd
                                 if (strType == "/BearingPoint")
                                 {
 
-                                    var compressedData = ZlibStream.UncompressBuffer(cByteArray);
 
-                                    var uncompressedData = ZlibStream.CompressBuffer(compressedData);
 
-                                    using (FileStream fs = new FileStream(@"F:\picture.png", FileMode.Create))
-                                    {
+                                    // zLib & print out
+                                    System.IO.MemoryStream msSinkDecompressed;
+                                    ZlibStream zOut;
+                                    
+                                    // now, decompress:
+                                    msSinkDecompressed = new System.IO.MemoryStream();
+                                    zOut = new ZlibStream(msSinkDecompressed, CompressionMode.Decompress, true);
+                                    CopyStream(StringToMemoryStream(sStream), zOut);
 
-                                        fs.Write(uncompressedData, 0, uncompressedData);
-                                    }
-
+                                    // at this point, msSinkDecompressed contains the decompressed bytes
+                                    sOutput = MemoryStreamToString(msSinkDecompressed);
+                                    //System.Console.Out.WriteLine("decompressed: {0}", decompressed);
+                                    //System.Console.WriteLine();
+                                    
                                 }
 
                             }
