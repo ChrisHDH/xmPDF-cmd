@@ -52,17 +52,37 @@ namespace xmPDF_cmd
                     // New Object
                     byte[] inStream = new byte[0];
                     bool bInStream = true;
-                    while (bInStream = true)
+                    while (bInStream == true)
                     {
                         inbytes = mPDF.ReadPdfNextline();
-                        if (mPDF.IndexOf(inbytes, mPDF.serXref) > -1)
+                        if (mPDF.IndexOf(inbytes, mPDF.serStreamEnd) > -1)
                         {
                             bInStream = false;
                             break;
                         }
                         Console.WriteLine("Line2: " + Encoding.UTF8.GetString(inbytes));
-                        mPDF.appendBytesValue(inStream, inbytes);
+
+                        byte[] outputBytes = new byte[inStream.Length + inbytes.Length];
+
+                        Buffer.BlockCopy(inStream, 0, outputBytes, 0, inStream.Length);
+                        Buffer.BlockCopy(inbytes, 0, outputBytes, inStream.Length, inbytes.Length);
+
+                        inStream = outputBytes;
                     }
+                    // remove last byte -----------------------------------------------------------------
+                    byte[] fixInStream = new byte[inStream.Length - 1];
+                    Buffer.BlockCopy(inStream, 0, fixInStream, 0, inStream.Length-1);
+                    inStream = fixInStream;
+
+                    Console.WriteLine("Line2: " + inStream.Length);
+
+                    // de-Encrypt ------------------------------------------------------------------------
+                    DeflateStream compressedStream = new DeflateStream(inStream, CompressionMode.Compress, true);
+
+
+
+
+
                 }
                 
             }
